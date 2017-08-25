@@ -14,6 +14,7 @@ class Spreadsheet(object):
         self.source = ""
         self.destination = ""
         self.application = ""
+        self.service = ""
         self.action = None
         self.description = None
         self.disabled = "no" # Set to no since the PAN might return nothing for permit.
@@ -21,7 +22,7 @@ class Spreadsheet(object):
 
     def writeRowHeaders(self):
         """Write the header row of the spreadsheet."""
-        titles = ["Rule Name", "From Zone", "To Zone", "Source", "Destination", "Application", "Action", "Description", "Disabled", "Expiration"]
+        titles = ["Rule Name", "From Zone", "To Zone", "Source", "Destination", "Application", "Service", "Action", "Description", "Disabled", "Expiration"]
         i = 0
         for title in titles:
             worksheet.write(0, i, title, bold)
@@ -61,6 +62,12 @@ class Spreadsheet(object):
             self.application += chr(10)
         self.application +=str(application) # Concatenate each entry.
 
+    def setService(self, service):
+        """Set firewall to service."""
+        if not self.service == "": # If there are multiple entries add a comma to separate.
+            self.service += chr(10)
+        self.service +=str(service) # Concatenate each entry.
+
     def setAction(self, action):
         """Populate the firewall rule action."""
         self.action = action
@@ -86,10 +93,11 @@ class Spreadsheet(object):
         worksheet.write(row, 3, self.source, dataformat)
         worksheet.write(row, 4, self.destination, dataformat)
         worksheet.write(row, 5, self.application, dataformat)
-        worksheet.write(row, 6, self.action, dataformat)
-        worksheet.write(row, 7, self.description, dataformat)
-        worksheet.write(row, 8, self.disabled, dataformat)
-        worksheet.write(row, 9, self.expiration, dataformat)
+        worksheet.write(row, 6, self.service, dataformat)
+        worksheet.write(row, 7, self.action, dataformat)
+        worksheet.write(row, 8, self.description, dataformat)
+        worksheet.write(row, 9, self.disabled, dataformat)
+        worksheet.write(row, 10, self.expiration, dataformat)
 
         print "Name: ", self.name
         print "From Zone: ", self.from_member
@@ -97,6 +105,7 @@ class Spreadsheet(object):
         print "Source: ", self.source
         print "Destination: ", self.destination
         print "Application: ", self.application
+        print "Service: ", self.service
         print "Action: ", self.action
         print "Disabled: ", self.disabled
         print "Description: ", self.description
@@ -109,7 +118,7 @@ class Spreadsheet(object):
 
 def commandlineparser():
     global args
-    parser = argparse.ArgumentParser(description='Convert Palo Alto Networks Firewall rules from Panorama to Microsoft Excel.', apilog='i.e. pan_to_excel.py --apikey "23j4kl2j34klj2kl4hf5yf" --firewall "Prod firewall 1" --panorama "https://panorama.somewhere.com')
+    parser = argparse.ArgumentParser(description='Convert Palo Alto Networks Firewall rules from Panorama to Microsoft Excel.', epilog='i.e. pan_to_excel.py --apikey "23j4kl2j34klj2kl4hf5yf" --firewall "Prod firewall 1" --panorama "https://panorama.somewhere.com')
     parser.add_argument('-k', '--apikey', required=True, help='PAN API Token Key')
     parser.add_argument('-f', '--firewall', required=True, help='Firewall Name')
     parser.add_argument('-p', '--panorama', required=True, help='Panorama Managment URL')
@@ -124,7 +133,7 @@ if __name__ == '__main__':
 
     url = "%s/api/?type=config&action=get&xpath=/config/devices/entry[@name=\'localhost.localdomain\']/device-group/entry[@name=\'%s\']/pre-rulebase/security/rules&key=%s" % (args.panorama, args.firewall, args.apikey)
 
-    xml = requests.get(url)
+    xml = requests.get(url, verify=False) 
 
     document = ET.fromstring(xml.content) # Parse the page the firewall returned as a string into the document object.
 
@@ -157,9 +166,13 @@ if __name__ == '__main__':
                     for members in source.findall("member"): # From source block - members block
                         excelobj.setSource(members.text)
 
-                for destination in entries.findall("destination"): # application block
-                    for members in destination.findall("member"): # application block - members block
+                for destination in entries.findall("destination"): # destination block
+                    for members in destination.findall("member"): # destination block - members block
                         excelobj.setDestination(members.text)
+
+                for service in entries.findall("service"): # service block
+                    for members in service.findall("member"): # service block - members block
+                        excelobj.setService(members.text)
 
                 for application in entries.findall("application"): # application block
                     for members in application.findall("member"): # application block - members block
@@ -200,6 +213,9 @@ if __name__ == '__main__':
 #               <destination>
 #                   <member>destination network</member>
 #               </destination>
+#               <service
+#		            <member>service</member
+#		        </service>
 #               <application>
 #                   <member>application</member>
 #               </application>
