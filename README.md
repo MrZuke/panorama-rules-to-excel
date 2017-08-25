@@ -14,12 +14,17 @@ Usage
         -k APIKEY, --apikey APIKEY
                               PAN API Token Key
         -f FIREWALL, --firewall FIREWALL
-                              Firewall Name
+                              Name of Firewall Device Group
         -p PANORAMA, --panorama PANORAMA
                               Panorama Managment URL
       
       i.e. pan_to_excel.py --apikey "23j4kl2j34klj2kl4hf5yf" --firewall "Prod
       firewall 1" --panorama "https://panorama.somewhere.com
+
+Usage Notes
+===========
+* The "firewall" listing is the device group and will list only rules specific to that device group.  Depending on hierarchy this may display more or less rules than you expect.
+* You must generate an API key for the firewall you plan to query.   See Palo Alto documentation for API key generation: https://www.paloaltonetworks.com/documentation/70/pan-os/pan-os/device-management/use-the-xml-api.html
 
 Dependencies
 ============
