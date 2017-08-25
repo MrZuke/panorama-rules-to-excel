@@ -1,7 +1,7 @@
 panorama-rules-to-excel
 =======================
 
-Create an Excel Spreadsheet from your firewall rules in Palo Alto Networks Panorama
+Create an Excel Spreadsheet from your firewall rules in Palo Alto Networks Panorama.
 
 Usage
 =====
@@ -29,3 +29,11 @@ Python with the following modules:
 * ElementTree
 * xlsxwriter
 * argparse
+
+Fork Specifics
+============
+This fork has the following changes:
+
+Fixed a bugin wherein "epi" was built "api" breaking the script
+Disabled SSL verify to enable self-signed panorama instances
+Added "services" to query
