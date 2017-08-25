@@ -34,6 +34,6 @@ Fork Specifics
 ============
 This fork has the following changes:
 
-Fixed a bugin wherein "epi" was built "api" breaking the script
-Disabled SSL verify to enable self-signed panorama instances
-Added "services" to query
+* Fixed a bugin wherein "epi" was built "api" breaking the script
+* Disabled SSL verify to enable self-signed panorama instances
+* Added "services" to query
